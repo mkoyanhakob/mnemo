@@ -1,0 +1,64 @@
+namespace: default
+
+#MNEMO APP
+mnemo:
+  image:
+    repository: nullnode/mnemo
+    tag: 0.1.0-arm
+
+  api:
+    port: 8080
+    host: 0.0.0.0
+
+  embedder:
+    sentenceTransformers:
+      model: "all-MiniLM-L6-v2"
+
+  llm:
+    model: "llama-3.1-8b-instant"
+    temperature: 0.1
+    tokens:
+      max: 600
+    openapi:
+      url: https://api.groq.com/openai/v1
+      keySecretName: openapi-key
+      key: <BASE64 TOKEN HERE>
+    
+
+#VECTOR DB
+chromadb:
+  image: 
+    repository: chromadb/chroma
+    tag: latest
+
+  service:
+    port: 8000
+
+  collection: 
+    name: kubernetes_events
+
+  query:
+    results_number: 10
+
+  #Just here in case anyone needs it to customize.
+  auth:
+    provider: "chromadb.auth.token.TokenAuthServerProvider"
+
+  data:
+    persistent: "TRUE"
+    allow_reset: "TRUE"
+    anonymized_telemetry: "FALSE"
+    directory: "/index/data"
+    storage: 10Gi
+
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+#ETCD
+etcd:
+  certsPath: "/var/lib/minikube/certs/etcd"

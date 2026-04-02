@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mnemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mnemo
+  template:
+    metadata:
+      labels:
+        app: mnemo
+    spec:
+      containers:
+        - name: mnemo
+          image: "{{ .Values.mnemo.image.repository }}:{{ .Values.mnemo.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.mnemo.api.port }}
+              protocol: TCP
+          env:
+            - name: ETCD_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: CHROMADB_HOST
+              value: "{{ printf "%s-service.%s.svc.cluster.local" "chromadb" .Release.Namespace }}"
+            - name: CHROMADB_PORT
+              value: "{{ .Values.chromadb.service.port }}"
+            - name: API_HOST
+              value: "{{ .Values.mnemo.api.host }}"
+            - name: API_PORT
+              value: "{{ .Values.mnemo.api.port }}"
+            - name: COLLECTION_NAME
+              value: "{{ .Values.chromadb.collection.name }}"
+            - name: QUERY_RESULTS_NUMBER
+              value: "{{ .Values.chromadb.query.results_number }}"
+            - name: SENTENCE_TRANSFORMER_MODEL
+              value: "{{ .Values.mnemo.embedder.sentenceTransformers.model }}"
+            - name: LLM_MODEL
+              value: "{{ .Values.mnemo.llm.model }}"
+            - name: OPENAPI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.mnemo.llm.openapi.keySecretName }}"
+                  key: api-key
+            - name: OPENAPI_BASE_URL
+              value: "{{ .Values.mnemo.llm.openapi.url }}"
+            - name: LLM_TEMP
+              value: "{{ .Values.mnemo.llm.temperature }}"
+            - name: LLM_MAX_TOKENS
+              value: "{{ .Values.mnemo.llm.tokens.max }}"
+          volumeMounts:
+            - name: etcd-certs
+              mountPath: /var/kubernetes/certs/etcd
+              readOnly: true
+      volumes:
+        - name: etcd-certs
+          hostPath:
+            path: "{{ .Values.etcd.certsPath }}"
+            type: Directory

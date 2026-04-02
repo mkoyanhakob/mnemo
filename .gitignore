@@ -1,0 +1,7 @@
+# Ignore DevSpace cache and log folder
+.devspace/
+LICENSE
+auger*
+devspace*
+__pycache__
+.DS_Store

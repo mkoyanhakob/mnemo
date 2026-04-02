@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: chromadb
+spec:
+  serviceName: "chromadb-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chromadb
+  template:
+    metadata:
+      labels:
+        app: chromadb
+    spec:
+      containers:
+      - name: chromadb
+        image: "{{ .Values.chromadb.image.repository }}:{{ .Values.chromadb.image.tag }}"
+        ports:
+          - containerPort: {{ .Values.chromadb.service.port }}
+            protocol: TCP
+        env:
+          - name: IS_PERSISTENT
+            value: "{{ .Values.chromadb.data.persistent }}"
+          - name: PERSIST_DIRECTORY
+            value: "{{ .Values.chromadb.data.directory }}" 
+          - name: ALLOW_RESET 
+            value: "{{ .Values.chromadb.data.allow_reset }}"
+          - name: ANONYMIZED_TELEMETRY
+            value: "{{ .Values.chromadb.data.anonymized_telemetry }}"
+          - name: CHROMA_SERVER_AUTH_PROVIDER
+            value: "{{ .Values.chromadb.auth.provider }}"
+        volumeMounts:
+          - name: chroma-data
+            mountPath: /index/data
+        resources:
+          {{- toYaml .Values.chromadb.resources | nindent 10 }}
+      volumes:
+      - name: chroma-data
+        persistentVolumeClaim:
+          claimName: chromadb-pvc
