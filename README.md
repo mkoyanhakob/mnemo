@@ -16,6 +16,8 @@ Mnemosyne remembers everything. So does Mnemo.
 
 ## What This Case Study Is About
 
+[https://www.linkedin.com/posts/hakob-mkoyan_case-study-rag-in-devopssre-processes-activity-7445524559430197248-NgdG?utm_source=share&utm_medium=member_desktop&rcm=ACoAADibxN0BxznOxKCNxXvYMbdjXLOWCyQXB_A](Find the full history here.)
+
 Modern Kubernetes clusters generate thousands of events per day — pod scheduling decisions, image pull failures, OOMKills, CrashLoopBackOffs, node evictions, quota violations. The problem is not that this information doesn't exist. The problem is that:
 
 - Kubernetes **deletes event history after 1 hour** by default
